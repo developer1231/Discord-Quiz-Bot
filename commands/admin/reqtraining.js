@@ -11,53 +11,29 @@ module.exports = {
     .setName("reqtraining")
     .setDescription(`Request a training`),
   async execute(interaction) {
-    const status = interaction.options.getString("status");
-    const activityType = interaction.options.getString("activity");
-    const activityName = interaction.options.getString("activityname");
+    const modal = new ModalBuilder()
+      .setCustomId("myModal")
+      .setTitle("My Modal");
 
-    if (
-      !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
-    ) {
-      const Embed = new EmbedBuilder()
-        .setTitle(":x: | Insufficient Permissions")
-        .setDescription(
-          `> ${interaction.member}, you don't have the required \`\`Administrator\`\` permissions to be able to use this command.\n> Please refrain from using this command.`
-        )
-        .setTimestamp()
-        .setAuthor({
-          name: `${interaction.client.user.username}`,
-          iconURL: `${interaction.client.user.displayAvatarURL()}`,
-        })
-        .setColor("Red");
-      return interaction.reply({ ephemeral: true, embeds: [Embed] });
-    }
-    let presenceData = { status };
+    const favoriteColorInput = new TextInputBuilder()
+      .setCustomId("favoriteColorInput")
 
-    if (activityType && activityName) {
-      presenceData.activities = [
-        { name: activityName, type: activityType.toUpperCase() },
-      ];
-    }
+      .setLabel("What's your favorite color?")
 
-    await interaction.client.user.setPresence(presenceData);
+      .setStyle(TextInputStyle.Short);
 
-    const Success = new EmbedBuilder()
-      .setTitle(":white_check_mark: | Successfully Changed Status")
-      .setDescription(
-        `> ${
-          interaction.member
-        }, you have successfully changed the status of the bot. Below you can find more information about the status that is set:\n> ✅ **Status:** ${status}\n> **Activity:** ${
-          activityType && activityName
-            ? ` **${activityType} ${activityName}**`
-            : ""
-        }\n\n> **Please give it a few minutes to change.**`
-      )
-      .setTimestamp()
-      .setAuthor({
-        name: `${interaction.client.user.username}`,
-        iconURL: `${interaction.client.user.displayAvatarURL()}`,
-      })
-      .setColor("Red");
-    await interaction.reply({ ephemeral: true, embeds: [Success] });
+    const hobbiesInput = new TextInputBuilder()
+      .setCustomId("hobbiesInput")
+      .setLabel("What's some of your favorite hobbies?")
+
+      .setStyle(TextInputStyle.Paragraph);
+
+    const firstActionRow = new ActionRowBuilder().addComponents(
+      favoriteColorInput
+    );
+    const secondActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
+
+    modal.addComponents(firstActionRow, secondActionRow);
+    await interaction.showModal(modal);
   },
 };
